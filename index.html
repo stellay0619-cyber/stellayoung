@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>马克思主义德育思想 · 互动练习</title>
+<style>
+  :root{
+    --red:#8a1f1f; --red-dark:#6d1717; --gold:#c9a24b; --cream:#faf6ef;
+    --ink:#2b2b2b; --line:#e7dcc8; --green:#2e7d4f; --gray:#8a8375;
+    --card:#ffffff; --bg:#f3ecdd;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",system-ui,sans-serif;
+    background:var(--bg); color:var(--ink); min-height:100vh; padding:24px 18px 40px;
+  }
+  .wrap{max-width:1080px;margin:0 auto}
+
+  /* ===== 顶部 ===== */
+  header{text-align:center;margin-bottom:18px}
+  header .badge{display:inline-block;font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:6px}
+  header h1{font-size:28px;color:var(--red);letter-spacing:1px}
+  header p{margin-top:6px;color:var(--gray);font-size:15px}
+
+  /* ===== 模式切换 ===== */
+  .tabs{display:flex;gap:10px;justify-content:center;margin:18px 0 14px;flex-wrap:wrap}
+  .tab{padding:10px 22px;border-radius:24px;border:1.5px solid var(--line);background:#fff;
+    cursor:pointer;font-size:15px;color:var(--ink);transition:.2s}
+  .tab.active{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 4px 12px rgba(138,31,31,.25)}
+  .tab .num{opacity:.7;font-size:13px;margin-left:4px}
+
+  /* ===== AI 生成工具条 ===== */
+  .toolbar{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;
+    background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin-bottom:20px}
+  .toolbar label{font-size:14px;color:var(--gray)}
+  .toolbar select{padding:8px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;background:#fff;color:var(--ink)}
+  .ai-btn{padding:10px 22px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--red),var(--red-dark));
+    color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:.2s}
+  .ai-btn:hover{filter:brightness(1.1)}
+  .ai-btn:disabled{opacity:.6;cursor:not-allowed}
+  .ai-btn .spark{font-size:16px}
+  .tip{font-size:13px;color:var(--gray);width:100%;text-align:center}
+
+  /* ===== 统计条 ===== */
+  .stats{display:flex;gap:18px;justify-content:center;margin-bottom:16px;font-size:14px;color:var(--gray)}
+  .stats b{color:var(--red);font-size:17px}
+
+  /* ===== 视图通用 ===== */
+  .view{display:none}
+  .view.active{display:block;animation:fade .3s}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ===== 背诵卡片 ===== */
+  .recite-stage{display:flex;flex-direction:column;align-items:center;gap:16px}
+  .card-box{perspective:1200px;width:100%;max-width:640px;min-height:300px;cursor:pointer}
+  .card-inner{position:relative;width:100%;min-height:300px;transition:transform .5s;transform-style:preserve-3d}
+  .card-inner.flipped{transform:rotateY(180deg)}
+  .card-face{position:absolute;inset:0;border-radius:18px;padding:28px 30px;background:var(--card);
+    border:1px solid var(--line);box-shadow:0 8px 24px rgba(90,60,20,.1);backface-visibility:hidden;
+    display:flex;flex-direction:column;justify-content:center;gap:12px}
+  .card-back{transform:rotateY(180deg)}
+  .card-face .sec-tag{align-self:flex-start;font-size:13px;color:var(--gold);border:1px solid var(--gold);
+    border-radius:10px;padding:3px 10px}
+  .card-face h3{font-size:22px;color:var(--red)}
+  .card-face .question{font-size:17px;line-height:1.8}
+  .card-back ul{padding-left:20px;line-height:1.9;font-size:16px}
+  .card-back li{margin-bottom:6px}
+  .flip-hint{font-size:13px;color:var(--gray)}
+  .recite-nav{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .nav-btn{padding:9px 18px;border:1px solid var(--line);background:#fff;border-radius:10px;cursor:pointer;font-size:14px}
+  .nav-btn.primary{background:var(--red);color:#fff;border-color:var(--red)}
+  .recite-counter{font-size:14px;color:var(--gray)}
+
+  /* ===== 题目卡片 ===== */
+  .quiz-list{display:flex;flex-direction:column;gap:16px;max-width:820px;margin:0 auto}
+  .q-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;
+    box-shadow:0 4px 14px rgba(90,60,20,.08)}
+  .q-head{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+  .q-index{background:var(--red);color:#fff;border-radius:10px;padding:3px 11px;font-size:14px}
+  .q-sec{font-size:13px;color:var(--gray)}
+  .q-type{font-size:12px;color:var(--gold);border:1px solid var(--gold);border-radius:8px;padding:2px 8px;margin-left:auto}
+  .q-title{font-size:17px;line-height:1.8;margin-bottom:14px}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .option{padding:12px 16px;border:1.5px solid var(--line);border-radius:12px;cursor:pointer;
+    font-size:15px;display:flex;gap:10px;align-items:flex-start;transition:.15s;background:#fff}
+  .option:hover{border-color:var(--gold)}
+  .option .letter{font-weight:700;color:var(--red);flex-shrink:0}
+  .option.correct{border-color:var(--green);background:#eef7f1}
+  .option.wrong{border-color:#c0392b;background:#fbeeee}
+  .option.disabled{cursor:default;pointer-events:none}
+  .explain{margin-top:12px;padding:12px 14px;border-radius:10px;background:#f7f1e3;font-size:14px;
+    line-height:1.8;display:none}
+  .explain.show{display:block}
+  .explain b{color:var(--red)}
+
+  /* ===== 闯关 ===== */
+  .stage-bar{display:flex;gap:8px;justify-content:center;margin-bottom:20px;flex-wrap:wrap}
+  .stage{padding:8px 16px;border-radius:12px;background:#fff;border:1px solid var(--line);font-size:14px;color:var(--gray)}
+  .stage.done{background:#eef7f1;border-color:var(--green);color:var(--green)}
+  .stage.current{background:var(--red);color:#fff;border-color:var(--red)}
+  .progress{height:10px;background:#ece3d0;border-radius:10px;overflow:hidden;max-width:820px;margin:0 auto 18px}
+  .progress i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--red));width:0;transition:.3s}
+  .result{max-width:640px;margin:20px auto;text-align:center;background:var(--card);border:1px solid var(--line);
+    border-radius:18px;padding:34px 28px}
+  .result .grade{font-size:34px;color:var(--red);margin:10px 0}
+  .result p{color:var(--gray);line-height:1.8;margin-bottom:16px}
+
+  .empty{text-align:center;color:var(--gray);padding:60px 20px;font-size:15px;line-height:2}
+  footer{text-align:center;margin-top:30px;font-size:12px;color:var(--gray)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="badge">德育原理 · 课堂互动</div>
+    <h1>马克思主义德育思想的主要内容</h1>
+    <p>背诵卡片 · 随堂练习 · 小组闯关（题目由内置题库智能抽取生成，可离线使用）</p>
+  </header>
+
+  <!-- 模式切换 -->
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-mode="recite">📇 背诵卡片</button>
+    <button class="tab" data-mode="quiz">✏️ 随堂练习</button>
+    <button class="tab" data-mode="level">🏆 小组闯关</button>
+  </div>
+
+  <!-- AI 生成工具条 -->
+  <div class="toolbar">
+    <label>知识范围</label>
+    <select id="scope">
+      <option value="all">全部四大板块</option>
+      <option value="sec1">一、自由全面发展</option>
+      <option value="sec2">二、本质与规律遵循</option>
+      <option value="sec3">三、实践与教劳结合</option>
+      <option value="sec4">四、理想信念与道德修养</option>
+    </select>
+    <button class="ai-btn" id="genBtn"><span class="spark">✨</span>AI 一键生成</button>
+    <div class="tip" id="tip">选择范围后点击「AI 一键生成」，自动抽取对应题目；点击选项即可触发问答反馈。</div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <!-- ===== 视图：背诵 ===== -->
+  <section class="view active" id="view-recite">
+    <div class="recite-stage">
+      <div class="card-box" id="cardBox">
+        <div class="card-inner" id="cardInner">
+          <div class="card-face card-front" id="cardFront"></div>
+          <div class="card-face card-back" id="cardBack"></div>
+        </div>
+      </div>
+      <div class="flip-hint">👆 点击卡片翻转，查看背诵要点</div>
+      <div class="recite-counter" id="reciteCounter"></div>
+      <div class="recite-nav">
+        <button class="nav-btn" id="prevBtn">← 上一张</button>
+        <button class="nav-btn primary" id="randomBtn">🎲 随机抽背</button>
+        <button class="nav-btn" id="nextBtn">下一张 →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 视图：随堂练习 ===== -->
+  <section class="view" id="view-quiz">
+    <div class="quiz-list" id="quizList"></div>
+  </section>
+
+  <!-- ===== 视图：小组闯关 ===== -->
+  <section class="view" id="view-level">
+    <div class="stage-bar" id="stageBar"></div>
+    <div class="progress"><i id="progressBar"></i></div>
+    <div id="levelArea"></div>
+  </section>
+
+  <footer>本页面为单文件离线网页，可在 PPT 中通过「插入 → 超链接 / 网页」调用，放映时点击打开即可。</footer>
+</div>
+
+<script>
+/* ==================== 题库（取自教材第二节） ==================== */
+const SEC = {
+  sec1:"一、以促进人的自由全面发展为指向",
+  sec2:"二、以人的本质和社会历史发展规律为遵循",
+  sec3:"三、以教育与生产劳动和社会实践相结合为原则",
+  sec4:"四、以共产主义理想信念和道德修养为内容"
+};
+
+/* 背诵卡片 */
+const RECITE = [
+  {sec:"sec1", title:"能力的全面发展", question:"人的全面发展实质上是什么？劳动能力处于什么地位？",
+    points:[
+      "人的全面发展实质上是人的能力体系的完善和丰富。",
+      "增强劳动能力是人的能力发展的主要内容，也是全面发展和能力体系完善的基础与核心。",
+      "智力发展：德育具有提高人的知识文化素养的特殊功用。",
+      "体力发展：通过培养劳动兴趣、形成正确劳动看法、养成劳动习惯与观念，增强意志、打造强健体魄。"
+    ]},
+  {sec:"sec1", title:"个性的自由解放", question:"德育促进个性自由解放体现在哪两个方面？",
+    points:[
+      "一是增强人的主体性：通过道德、智力、能力的培养提高自我认识，使个体能动地适应并变革客观世界。",
+      "二是丰富人的独特性：培养自觉能动性、创造性和自主性，消除个性的模式化、同步化、标准化。",
+      "打破个性的单调化、定型化，追求并保持独特的人格理想、社会形象和能力体系。"
+    ]},
+  {sec:"sec2", title:"人的本质是一切社会关系的总和", question:"如何理解马克思关于人的本质的论断？",
+    points:[
+      "人的本质不是单个人所固有的抽象物，在其现实性上，它是一切社会关系的总和。",
+      "引导人们正确处理社会关系是德育的基本任务。",
+      "道德是社会关系的调节器。"
+    ]},
+  {sec:"sec2", title:"社会基本矛盾是历史发展的根本动力", question:"德育与经济基础、上层建筑是什么关系？",
+    points:[
+      "德育作为生产关系总和之上的上层建筑，总是受到物质生产方式的制约，并反作用于一定的现实基础。",
+      "德育实践必须以社会矛盾运动的客观规律为遵循，保持同一定社会经济基础和上层建筑的内在一致性。",
+      "向社会成员传授集中反映一定社会发展所需要的主流意识形态。"
+    ]},
+  {sec:"sec3", title:"全部社会生活在本质上是实践的", question:"为什么说实践是德育的物质基础？",
+    points:[
+      "实践的观点是马克思主义哲学的基本观点。",
+      "实践为人的道德发展和德育活动开展提供物质基础。",
+      "德育根植于人们的社会实践，并构成实践的重要内容。"
+    ]},
+  {sec:"sec3", title:"教劳结合是造就全面发展的人的唯一方法", question:"怎样理解教育与生产劳动相结合？",
+    points:[
+      "未来教育就是生产劳动同智育和体育相结合。",
+      "它不仅是提高社会生产的一种方法，而且是造就全面发展的人的唯一方法。",
+      "重在提升人的科学文化素养和劳动技能，增强思想道德素质和劳动积极性。"
+    ]},
+  {sec:"sec4", title:"坚定理想信念", question:"新时代坚定理想信念包括哪些内容？",
+    points:[
+      "坚定对马克思主义的信仰、对中国特色社会主义的信念、对实现中华民族伟大复兴中国梦的信心。",
+      "一方面引导广大人民群众树立中国特色社会主义共同理想。",
+      "另一方面引导人们树立共产主义远大理想和坚定信念。"
+    ]},
+  {sec:"sec4", title:"坚持集体主义的道德原则", question:"集体主义道德原则的基本要求是什么？",
+    points:[
+      "确保一切言论和行动合乎广大人民群众的集体利益。",
+      "集体主义是个人与集体辩证统一关系在道德上的反映。",
+      "是科学处理个体利益与集体利益关系的价值观念和行为准则，是马克思主义德育的重要遵循。"
+    ]},
+  {sec:"sec4", title:"弘扬和培育社会主义核心价值观", question:"核心价值观对德育工作有何作用？",
+    points:[
+      "从思想道德层面建构起新时代人民精神生活的价值标准和伦理理想。",
+      "一方面，社会主义核心价值观构成德育开展的思想基础。",
+      "另一方面，为德育工作的开展提供实践指导。"
+    ]}
+];
+
+/* 练习题：type single 单选 / judge 判断；answer 为选项下标 */
+const QUIZ = [
+  {sec:"sec1", type:"single", q:"在人的能力体系中，能力发展的主要内容、基础与核心是（  ）。",
+   options:["劳动能力","审美能力","社交能力","语言能力"], answer:0,
+   explain:"增强劳动能力是人的能力发展的主要内容，也是人的全面发展和能力体系完善的基础与核心。"},
+  {sec:"sec1", type:"judge", q:"德育促进体力发展，可以通过培养劳动兴趣、引导正确劳动看法、养成劳动习惯与观念，来增强意志、打造强健体魄。",
+   options:["正确","错误"], answer:0,
+   explain:"表述符合教材观点：德育通过劳动兴趣与劳动观念的培养，促进人的体力与意志发展。"},
+  {sec:"sec1", type:"single", q:"以德育促进人的个性自由解放，主要体现在（  ）。",
+   options:["增强主体性与丰富独特性","追求不受约束的个人自由","否定集体对个人的约束","按统一标准塑造个性"], answer:0,
+   explain:"个性自由解放一是增强主体性，二是丰富独特性；要消除模式化、标准化，而非否定集体。"},
+  {sec:"sec2", type:"single", q:"马克思指出，人的本质在其现实性上是（  ）。",
+   options:["单个人所固有的抽象物","一切社会关系的总和","先天固有的理性","人的自然本性"], answer:1,
+   explain:"人的本质不是单个人所固有的抽象物，在其现实性上，它是一切社会关系的总和。"},
+  {sec:"sec2", type:"single", q:"历史发展的根本动力是（  ）。",
+   options:["思想观念的更替","社会基本矛盾","杰出人物的意志","地理环境条件"], answer:1,
+   explain:"社会基本矛盾是历史发展的根本动力；德育作为上层建筑，受物质生产方式制约并反作用于现实基础。"},
+  {sec:"sec2", type:"judge", q:"德育作为上层建筑，总是受到物质生产方式的制约，并反作用于一定的现实基础。",
+   options:["正确","错误"], answer:0,
+   explain:"表述正确。德育实践必须遵循社会矛盾运动的客观规律，传授主流意识形态。"},
+  {sec:"sec3", type:"single", q:"马克思主义认为，全部社会生活在本质上是（  ）。",
+   options:["精神的","实践的","观念的","偶然的"], answer:1,
+   explain:"实践的观点是马克思主义哲学的基本观点；实践为道德发展和德育活动提供物质基础。"},
+  {sec:"sec3", type:"single", q:"造就全面发展的人的唯一方法是（  ）。",
+   options:["单纯的课堂讲授","教育与生产劳动相结合","个人自学钻研","各类竞赛评比"], answer:1,
+   explain:"教育与生产劳动相结合，不仅是提高社会生产的方法，也是造就全面发展的人的唯一方法。"},
+  {sec:"sec4", type:"single", q:"在我国，坚定理想信念就是要坚定（  ）。",
+   options:["对马克思主义的信仰","对中国特色社会主义的信念","对实现中华民族伟大复兴中国梦的信心","以上三项都是"], answer:3,
+   explain:"坚定理想信念包括马克思主义信仰、中国特色社会主义信念、民族复兴中国梦的信心三个方面。"},
+  {sec:"sec4", type:"judge", q:"坚持集体主义道德原则，就是确保一切言论和行动合乎广大人民群众的集体利益。",
+   options:["正确","错误"], answer:0,
+   explain:"表述正确。集体主义是个人与集体辩证统一关系在道德上的反映。"},
+  {sec:"sec4", type:"single", q:"社会主义核心价值观对德育工作的作用是（  ）。",
+   options:["构成思想基础并提供实践指导","与德育工作无关","仅起装饰作用","限制学生个性发展"], answer:0,
+   explain:"核心价值观既是德育开展的思想基础，也为德育工作提供实践指导。"}
+];
+
+/* ==================== 状态 ==================== */
+const state = {
+  mode:"recite", scope:"all",
+  reciteList:[], reciteIdx:0, flipped:false,
+  quizList:[], quizScore:0, quizDone:0,
+  levelGroups:[], level:0, levelIdx:0, levelScore:0, levelDone:false
+};
+
+const $ = id => document.getElementById(id);
+const shuffle = arr => arr.map(v=>({v,r:Math.random()})).sort((a,b)=>a.r-b.r).map(o=>o.v);
+const inScope = item => state.scope==="all" || item.sec===state.scope;
+
+/* ==================== AI 生成 ==================== */
+$("genBtn").addEventListener("click", ()=>{
+  const btn = $("genBtn");
+  btn.disabled = true;
+  btn.innerHTML = "<span class='spark'>⏳</span>AI 正在抽取题目…";
+  setTimeout(()=>{
+    // 背诵：范围内全部卡片，洗牌
+    state.reciteList = shuffle(RECITE.filter(inScope));
+    state.reciteIdx = 0; state.flipped = false;
+    // 练习：范围内抽 6 题（不足则全取），洗牌
+    state.quizList = shuffle(QUIZ.filter(inScope)).slice(0,6);
+    state.quizScore = 0; state.quizDone = 0;
+    // 闯关：按板块分组
+    const secs = state.scope==="all" ? ["sec1","sec2","sec3","sec4"] : [state.scope];
+    state.levelGroups = secs.map(s=>({sec:s, list:shuffle(QUIZ.filter(q=>q.sec===s)).slice(0,2)}));
+    state.levelGroups = state.levelGroups.filter(g=>g.list.length>0);
+    state.level = 0; state.levelIdx = 0; state.levelScore = 0; state.levelDone = false;
+    btn.disabled = false;
+    btn.innerHTML = "<span class='spark'>✨</span>AI 一键生成";
+    $("tip").textContent = "已生成：背诵卡片 " + state.reciteList.length + " 张 · 练习题 " + state.quizList.length +
+      " 道 · 闯关 " + state.levelGroups.length + " 关。点击选项即可触发问答反馈。";
+    renderAll();
+  }, 1200);
+});
+
+/* ==================== 模式切换 ==================== */
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+    state.mode = t.dataset.mode;
+    renderAll();
+  });
+});
+
+/* ==================== 渲染入口 ==================== */
+function renderAll(){
+  $("view-recite").classList.toggle("active", state.mode==="recite");
+  $("view-quiz").classList.toggle("active", state.mode==="quiz");
+  $("view-level").classList.toggle("active", state.mode==="level");
+  if(state.mode==="recite") renderRecite();
+  if(state.mode==="quiz") renderQuiz();
+  if(state.mode==="level") renderLevel();
+  renderStats();
+}
+
+function renderStats(){
+  let html = "";
+  if(state.mode==="quiz") html = `<span>已答 <b>${state.quizDone}</b> 题</span><span>答对 <b>${state.quizScore}</b> 题</span>`;
+  if(state.mode==="level") html = `<span>当前总分 <b>${state.levelScore}</b> 分</span><span>进度 <b>${state.levelIdx+state.level*2}/${state.levelGroups.reduce((n,g)=>n+g.list.length,0)}</b></span>`;
+  if(state.mode==="recite") html = `<span>共 <b>${state.reciteList.length}</b> 张卡片</span>`;
+  $("stats").innerHTML = html;
+}
+
+/* ==================== 背诵视图 ==================== */
+function renderRecite(){
+  const box = $("cardBox");
+  if(!state.reciteList.length){ box.innerHTML = '<div class="empty">暂无卡片，请先点击「AI 一键生成」。</div>'; $("reciteCounter").textContent=""; return; }
+  const card = state.reciteList[state.reciteIdx];
+  $("cardFront").innerHTML = `
+    <span class="sec-tag">${SEC[card.sec]}</span>
+    <h3>${card.title}</h3>
+    <div class="question">${card.question}</div>`;
+  $("cardBack").innerHTML = `
+    <span class="sec-tag">背诵要点</span>
+    <ul>${card.points.map(p=>`<li>${p}</li>`).join("")}</ul>`;
+  $("cardInner").classList.remove("flipped");
+  state.flipped = false;
+  $("reciteCounter").textContent = `第 ${state.reciteIdx+1} / ${state.reciteList.length} 张`;
+}
+$("cardBox").addEventListener("click", ()=>{
+  if(!state.reciteList.length) return;
+  state.flipped = !state.flipped;
+  $("cardInner").classList.toggle("flipped", state.flipped);
+});
+$("prevBtn").addEventListener("click", ()=>{ if(state.reciteIdx>0){state.reciteIdx--;renderRecite();} });
+$("nextBtn").addEventListener("click", ()=>{ if(state.reciteIdx<state.reciteList.length-1){state.reciteIdx++;renderRecite();} });
+$("randomBtn").addEventListener("click", ()=>{
+  if(state.reciteList.length<2) return;
+  let n; do{ n = Math.floor(Math.random()*state.reciteList.length); }while(n===state.reciteIdx);
+  state.reciteIdx = n; renderRecite();
+});
+
+/* ==================== 练习视图 ==================== */
+function renderQuiz(){
+  const list = $("quizList");
+  if(!state.quizList.length){ list.innerHTML = '<div class="empty">暂无题目，请先点击「AI 一键生成」。</div>'; return; }
+  list.innerHTML = state.quizList.map((q,i)=>`
+    <div class="q-card" data-i="${i}">
+      <div class="q-head">
+        <span class="q-index">第 ${i+1} 题</span>
+        <span class="q-sec">${SEC[q.sec]}</span>
+        <span class="q-type">${q.type==="judge"?"判断题":"单选题"}</span>
+      </div>
+      <div class="q-title">${q.q}</div>
+      <div class="options">
+        ${q.options.map((o,oi)=>`
+          <div class="option" data-q="${i}" data-o="${oi}">
+            <span class="letter">${String.fromCharCode(65+oi)}</span><span>${o}</span>
+          </div>`).join("")}
+      </div>
+      <div class="explain" id="exp-${i}"><b>解析：</b>${q.explain}</div>
+    </div>`).join("");
+
+  list.querySelectorAll(".option").forEach(opt=>{
+    opt.addEventListener("click", ()=>answerQuiz(+opt.dataset.q, +opt.dataset.o, opt));
+  });
+}
+
+function answerQuiz(qi, oi, opt){
+  const q = state.quizList[qi];
+  const card = opt.closest(".q-card");
+  if(card.dataset.locked) return;
+  card.dataset.locked = "1";
+  card.querySelectorAll(".option").forEach(o=>o.classList.add("disabled"));
+  if(oi===q.answer){
+    opt.classList.add("correct");
+    state.quizScore++;
+  }else{
+    opt.classList.add("wrong");
+    card.querySelectorAll(".option")[q.answer].classList.add("correct");
+  }
+  state.quizDone++;
+  $("exp-"+qi).classList.add("show");
+  renderStats();
+}
+
+/* ==================== 闯关视图 ==================== */
+function renderLevel(){
+  const area = $("levelArea");
+  if(!state.levelGroups.length){ area.innerHTML = '<div class="empty">暂无关卡，请先点击「AI 一键生成」。</div>'; $("stageBar").innerHTML=""; $("progressBar").style.width="0"; return; }
+
+  // 关卡条
+  $("stageBar").innerHTML = state.levelGroups.map((g,i)=>{
+    const cls = i<state.level?"done":(i===state.level?"current":"");
+    return `<div class="stage ${cls}">第${["一","二","三","四"][i]||i+1}关 · ${SEC[g.sec].slice(0,6)}…</div>`;
+  }).join("");
+
+  const total = state.levelGroups.reduce((n,g)=>n+g.list.length,0);
+  const doneCount = state.levelGroups.slice(0,state.level).reduce((n,g)=>n+g.list.length,0)+state.levelIdx;
+  $("progressBar").style.width = (doneCount/total*100)+"%";
+
+  if(state.levelDone){ renderLevelResult(area); return; }
+
+  const group = state.levelGroups[state.level];
+  const q = group.list[state.levelIdx];
+  area.innerHTML = `
+    <div class="quiz-list">
+      <div class="q-card">
+        <div class="q-head">
+          <span class="q-index">第 ${state.level+1} 关</span>
+          <span class="q-sec">${SEC[q.sec]}</span>
+          <span class="q-type">闯关题 ${state.levelIdx+1}/${group.list.length}</span>
+        </div>
+        <div class="q-title">${q.q}</div>
+        <div class="options" id="levelOpts">
+          ${q.options.map((o,oi)=>`
+            <div class="option" data-o="${oi}"><span class="letter">${String.fromCharCode(65+oi)}</span><span>${o}</span></div>`).join("")}
+        </div>
+        <div class="explain" id="levelExp"><b>解析：</b>${q.explain}</div>
+      </div>
+    </div>`;
+
+  $("levelOpts").querySelectorAll(".option").forEach(opt=>{
+    opt.addEventListener("click", ()=>answerLevel(+opt.dataset.o, opt));
+  });
+}
+
+function answerLevel(oi, opt){
+  const group = state.levelGroups[state.level];
+  const q = group.list[state.levelIdx];
+  const box = $("levelOpts");
+  if(box.dataset.locked) return;
+  box.dataset.locked = "1";
+  box.querySelectorAll(".option").forEach(o=>o.classList.add("disabled"));
+
+  if(oi===q.answer){
+    opt.classList.add("correct");
+    state.levelScore += 10;
+  }else{
+    opt.classList.add("wrong");
+    box.querySelectorAll(".option")[q.answer].classList.add("correct");
+  }
+  $("levelExp").classList.add("show");
+  renderStats();
+
+  setTimeout(()=>{
+    state.levelIdx++;
+    if(state.levelIdx >= group.list.length){
+      state.level++;
+      state.levelIdx = 0;
+      if(state.level >= state.levelGroups.length){ state.levelDone = true; }
+    }
+    renderLevel();
+  }, 1400);
+}
+
+function renderLevelResult(area){
+  const total = state.levelGroups.reduce((n,g)=>n+g.list.length,0);
+  const full = total*10;
+  const ratio = state.levelScore/full;
+  let grade, comment;
+  if(ratio===1){ grade="🏅 满分通关"; comment="全部答对，对本节马克思主义德育思想掌握扎实！"; }
+  else if(ratio>=0.7){ grade="🎉 顺利通关"; comment="表现优秀，个别知识点可回到背诵卡片再巩固。"; }
+  else { grade="💪 继续加油"; comment="已完成闯关，建议结合背诵卡片复习后重新挑战。"; }
+  $("progressBar").style.width = "100%";
+  area.innerHTML = `
+    <div class="result">
+      <div>闯关结算</div>
+      <div class="grade">${grade}</div>
+      <p>本次得分 <b style="color:var(--red);font-size:22px">${state.levelScore}</b> / ${full} 分</p>
+      <p>${comment}</p>
+      <button class="ai-btn" onclick="restartLevel()">🔄 重新闯关</button>
+    </div>`;
+}
+function restartLevel(){
+  state.level = 0; state.levelIdx = 0; state.levelScore = 0; state.levelDone = false;
+  renderLevel(); renderStats();
+}
+
+/* 初始生成一次，打开即可用 */
+window.addEventListener("load", ()=>{
+  state.reciteList = shuffle(RECITE);
+  state.quizList = shuffle(QUIZ).slice(0,6);
+  const secs = ["sec1","sec2","sec3","sec4"];
+  state.levelGroups = secs.map(s=>({sec:s, list:shuffle(QUIZ.filter(q=>q.sec===s)).slice(0,2)}));
+  renderAll();
+});
+</script>
+</body>
+</html>
